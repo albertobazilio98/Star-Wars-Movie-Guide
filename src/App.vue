@@ -93,6 +93,7 @@
 </template>
 
 <script>
+import find from "@/services/api-service";
 
 export default {
   name: 'app',
@@ -117,6 +118,17 @@ export default {
     languageDialog () {
       this.dialog = !this.dialog;
     },
+    async listMovies() {
+      try {
+        let response = await find(this.wookie?"wookie":"json");
+        this.movies = response.data.results;
+      } catch (e) {
+        this.movies = {};
+      }
+    }
+  },
+  created() {
+    this.listMovies();
   }
 }
 </script>
