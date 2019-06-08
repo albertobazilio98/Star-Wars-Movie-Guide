@@ -1,28 +1,40 @@
 <template>
   <v-app>
+    <v-img
+      :src="require('@/images/bg.jpg')"
+    >
     <div>
-      <v-toolbar>
+      <v-toolbar color="#FAC223">
         <v-toolbar-title> Star Wars </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn @click="languageDialog" color="primary"> {{ language }}? </v-btn>
-        
+        <v-btn @click="openLanguageDialog" outline round color="white"> 
+          {{ language }}? 
+        </v-btn>
       </v-toolbar>
       <div>
         <v-container>
           <v-layout align-center justify-center>
             <v-flex xs12 sm8 lg6>
-              <v-card>
+              <v-card style="
+                color: yellow">
                 <v-data-table
+                  dark
                   :headers="headers"
                   :items="movies"
                   item-key="title"
-                  class="elevation-1"
                   hide-actions
                 >
                   <template v-slot:items="props">
-                    <tr @click="props.expanded = !props.expanded">
-                      <td class="text-xs-center">{{ props.item.episode }}</td>
+                    <tr @click="openDetailsDialog(props.items)" >
+                      <td class="text-xs-center" style="color: #FAC223">{{ roman[props.item.episode_id] }}</td>
                       <td>{{ props.item.title }}</td>
+                      <td class="text-xs-right">
+                        <v-icon
+                          color="#FAC223 "
+                          @click="openDetailsDialog()"
+                        > 
+                          info_outlined </v-icon>
+                      </td>
                     </tr>
                   </template>
                   <template v-slot:expand="props">
@@ -39,10 +51,10 @@
             </template>
           </v-layout>
           <v-layout row justify-center>
-            <v-dialog v-model="dialog" max-width="600px">
-              <v-card>
+            <v-dialog v-model="languageDialog" max-width="600px">
+              <v-card style="background: linear-gradient(to top, #424242, #212121)">
                 <v-card-title>
-                  <span class="headline">Select your race</span>
+                  <span class="headline">Select your specie</span>
                 </v-card-title>
                 <v-container
                   fluid
@@ -55,13 +67,13 @@
                         <v-card
                           slot-scope="{ hover }"
                           :class="`elevation-${hover ? 24 : 2}`"
-                          @click="wookie = true, languageDialog()"
+                          @click="wookiee = false, openLanguageDialog()"
                         >
                           <v-img
-                            :src="require('@/images/wookie.png')"
+                            :src="require('@/images/Jedi.png')"
                             class="grey darken-4"
                           ></v-img>
-                          <v-card-title class="title">Wookie</v-card-title>
+                          <v-card-title class="title">Jedi</v-card-title>
                         </v-card>
                       </v-hover>
                     </v-flex>
@@ -71,13 +83,12 @@
                         <v-card
                           slot-scope="{ hover }"
                           :class="`elevation-${hover ? 24 : 2}`"
-                          @click="wookie = false, languageDialog()"
                         >
                           <v-img
-                            :src="require('@/images/Jedi.png')"
+                            :src="require('@/images/wookieeDeactivated.png')"
                             class="grey darken-4"
                           ></v-img>
-                          <v-card-title class="title">Jedi</v-card-title>
+                          <v-card-title class="title">Wookiee (Not Working :/) </v-card-title>
                         </v-card>
                       </v-hover>
                     </v-flex>
@@ -89,6 +100,7 @@
         </v-container>
       </div>
     </div>
+    </v-img>
   </v-app>
 </template>
 
@@ -98,30 +110,43 @@ import find from "@/services/api-service";
 export default {
   name: 'app',
   data: () => ({
-    wookie: false,
-    dialog: true,
+    wookiee: false,
+    languageDialog: true,
+    detailsDialog: false,
     headers: [
-      { text: "espisódio", value: "episode", width: "10%"},
-      { text: "Título", value: "title"}
+      { text: "espisódio",  value: "episode", width: "10" },
+      { text: "Título",     value: "title"   },
+      { text: "",           value: "actions" }
     ],
+    movie: {},
     movies: [],
-    roman: ["I", "II", "III", "IV", "V", "VI", "VII"]
+    roman: ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
   }),
   computed: {
     language() {
-      return this.wookie
+      return this.wookiee
         ? "Jedi"
-        : "Wookie";
+        : "wookiee";
     }
   },
   methods: {
-    languageDialog () {
-      this.dialog = !this.dialog;
+    openDetailsDialog (item) {
+      this.detailsDialog = !this.detailsDialog;
+      this.movie = item;
+    },
+    openLanguageDialog () {
+      this.languageDialog = !this.languageDialog;
     },
     async listMovies() {
       try {
-        let response = await find(this.wookie?"wookie":"json");
+        //if (!this.wookiee){
+        let response = await find("json");
         this.movies = response.data.results;
+        /*} else {
+          let response = await find("wookiee");
+          this.movies = response.data.rcwochuanaoc;
+          console.log(response)
+        }*/
       } catch (e) {
         this.movies = {};
       }
@@ -129,7 +154,17 @@ export default {
   },
   created() {
     this.listMovies();
+  },
+  watch: {
+    wookiee:{
+      handler(value){
+        this.listMovies();
+        return value;
+      }
+    }
   }
-}
+};
 </script>
+
+
 

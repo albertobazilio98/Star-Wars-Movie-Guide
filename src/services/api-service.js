@@ -8,8 +8,8 @@ const api = () => {
   return api;
 };
 
-const find = race => {
-  return api().get(`?format=${race}`);
+const find = language => {
+  return api().get(`?format=${language}`);
 };
 
 export default find;
