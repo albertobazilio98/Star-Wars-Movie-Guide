@@ -4,7 +4,7 @@
       :src="require('@/images/bg.jpg')"
     >
     <div>
-      <v-toolbar color="#FAC223">
+      <v-toolbar color="primary">
         <v-toolbar-title> Star Wars </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn @click="openLanguageDialog" outline round color="white"> 
@@ -15,23 +15,23 @@
         <v-container>
           <v-layout align-center justify-center>
             <v-flex xs12 sm8 lg6>
-              <v-card style="
-                color: yellow">
+              <v-card>
                 <v-data-table
                   dark
+                  disable-initial-sort
                   :headers="headers"
                   :items="movies"
-                  item-key="title"
+                  item-key="episode"
                   hide-actions
                 >
                   <template v-slot:items="props">
-                    <tr @click="openDetailsDialog(props.items)" >
-                      <td class="text-xs-center" style="color: #FAC223">{{ roman[props.item.episode_id] }}</td>
+                    <tr>
+                      <td class="text-xs-center" style="color: #FAC223" >{{ roman[props.item.episode_id] }}</td>
                       <td>{{ props.item.title }}</td>
                       <td class="text-xs-right">
                         <v-icon
-                          color="#FAC223 "
-                          @click="openDetailsDialog()"
+                          color="primary"
+                          @click="openDetailsDialog(props.item)"
                         > 
                           info_outlined </v-icon>
                       </td>
@@ -50,11 +50,12 @@
             <template>
             </template>
           </v-layout>
+
           <v-layout row justify-center>
             <v-dialog v-model="languageDialog" max-width="600px">
               <v-card style="background: linear-gradient(to top, #424242, #212121)">
                 <v-card-title>
-                  <span class="headline">Select your specie</span>
+                  <span class="headline" style="color: #FAC223">Select your specie</span>
                 </v-card-title>
                 <v-container
                   fluid
@@ -97,6 +98,30 @@
               </v-card>
             </v-dialog>
           </v-layout>
+
+          <v-layout row justify-center>
+            <v-dialog v-model="detailsDialog" max-width="600px">
+              <v-card style="background: linear-gradient(to top, #424242, #212121)">
+                <v-card-title>
+                  <span class="headline" style="color: #FAC223">{{ this.movie.title }}</span>
+                </v-card-title>
+                <v-container
+                  fluid
+                  grid-list-lg
+                  fill-height
+                >
+                  <v-layout>
+                    <v-flex xs6>
+
+                    </v-flex>
+                    <v-flex xs6>
+                      
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card>
+            </v-dialog>
+          </v-layout>
         </v-container>
       </div>
     </div>
@@ -120,7 +145,7 @@ export default {
     ],
     movie: {},
     movies: [],
-    roman: ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
+    roman: ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
   }),
   computed: {
     language() {
@@ -131,8 +156,8 @@ export default {
   },
   methods: {
     openDetailsDialog (item) {
-      this.detailsDialog = !this.detailsDialog;
       this.movie = item;
+      this.detailsDialog = !this.detailsDialog;
     },
     openLanguageDialog () {
       this.languageDialog = !this.languageDialog;
@@ -150,6 +175,18 @@ export default {
       } catch (e) {
         this.movies = {};
       }
+    },
+    customSort(items, index, isDescending) {
+      items.sort((a, b) => {
+        if (index === 'episode_id') {
+          if (isDescending) {
+            return b.calories - a.calories;
+          } else {
+            return a.calories - b.calories;
+          }
+        }
+      });
+      return items;
     }
   },
   created() {
