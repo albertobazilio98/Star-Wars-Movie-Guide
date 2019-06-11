@@ -1,12 +1,12 @@
-const http = require("http");
-const port = process.env.PORT || 3000;
+var express = require("express");
+var path = require("path");
+var serveStatic = require("serve-static");
+var history = require("connect-history-api-fallback");
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/html");
-  res.end("<h1>Hello World</h1>");
-});
+var app = express();
+app.use(history());
+app.use(serveStatic(path.join(__dirname, "dist")));
 
-server.listen(port, () => {
-  console.log(`Server running at port ` + port);
-});
+var port = process.env.PORT || 8080;
+// eslint-disable-next-line no-console
+app.listen(port, () => console.log(`ADMIN rodando na porta ${port}`));
