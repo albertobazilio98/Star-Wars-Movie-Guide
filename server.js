@@ -1,21 +1,12 @@
 const http = require("http");
-const fs = require("fs");
-const httpPort = 80;
+const port = process.env.PORT || 3000;
 
-http
-  .createServer((req, res) => {
-    fs.readFile("index.html", "utf-8", (err, content) => {
-      if (err) {
-        console.log('We cannot open "index.htm" file.');
-      }
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/html");
+  res.end("<h1>Hello World</h1>");
+});
 
-      res.writeHead(200, {
-        "Content-Type": "text/html; charset=utf-8"
-      });
-
-      res.end(content);
-    });
-  })
-  .listen(httpPort, () => {
-    console.log("Server listening on: http://localhost:%s", httpPort);
-  });
+server.listen(port, () => {
+  console.log(`Server running at port ` + port);
+});
