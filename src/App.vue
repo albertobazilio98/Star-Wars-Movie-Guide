@@ -11,9 +11,10 @@
       <div>
         <v-container>
           <v-layout align-center justify-center>
-            <v-flex xs12 sm8 lg6>
-              <v-card color="#424242" dark>
+            <v-flex xs12 sm10 lg8>
+              <v-card dark>
                 <v-card-title>
+                  <!-- data table que mostra os filmes -->
                   <v-text-field
                     v-model="search"
                     append-icon="search"
@@ -25,22 +26,27 @@
                 </v-card-title>
                 <v-data-table
                   dark
-                  disable-initial-sort
                   :headers="headers"
                   :items="movies"
                   hide-actions
                   :search="search"
                 >
+                  <template v-slot:no-data>
+                      Any movie found
+                  </template>
                   <template v-slot:items="props">
                     <tr>
-                      <td class="text-xs-center" style="color: #FAC223" >{{ roman[props.item.episode_id] }}</td>
+                      <td class="text-xs-center" style="color: #FAC223">
+                        {{ roman[props.item.episode_id] }}
+                      </td>
                       <td>{{ props.item.title }}</td>
                       <td class="text-xs-right">
                         <v-icon
                           color="primary"
                           @click="openDetailsDialog(props.item)"
                         > 
-                          info_outlined </v-icon>
+                          info_outlined 
+                        </v-icon>
                       </td>
                     </tr>
                   </template>
@@ -53,12 +59,21 @@
             </template>
           </v-layout>
 
+          <!-- dialog de detalhes -->
           <v-layout align-space-between justify-center row fill-height>
-            <v-dialog v-model="detailsDialog" max-width="800px">
+            <v-dialog 
+              v-model="detailsDialog" 
+              max-width="800px"
+              persistent
+            >
+              <v-toolbar color="primary" class="elevation-24">
+                <v-toolbar-title> {{ movie.title }} </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="closeDetailsDialog">
+                  <v-icon color="black">close</v-icon>
+                </v-btn>
+              </v-toolbar>
               <v-card style="background: linear-gradient(to top, #424242, #212121)">
-                <v-card-title>
-                  <span class="headline" style="color: #FAC223">{{ movie.title }}</span>
-                </v-card-title>
                 <v-container
                   fluid
                   grid-list-lg
@@ -66,12 +81,14 @@
                 >
                   <v-layout wrap>
                     <v-flex xs12 md6>
-                      <v-card class="elevation-6">
+                      <!-- card com o poster do filme -->
+                      <v-card class="elevation-12">
                         <v-img
                           :src="movie.poster"
                           class="grey darken-4"
                         ></v-img>
                       </v-card>
+                      <!-- botão que inicia a animação "opening crawl" -->
                       <div class="text-xs-center">
                         <v-btn
                           round
@@ -81,7 +98,7 @@
                         >Opening Crawl</v-btn>
                       </div>
                     </v-flex>
-
+                    <!-- card com a ficha técnica -->
                     <v-flex xs12 md6>
                       <v-card class="elevation-3" color="grey">
                         <v-container>
@@ -94,120 +111,138 @@
                           producer: {{ movie.producer }}
                         </v-container>
                       </v-card>
-
                       <v-container></v-container>
                       
                       <v-card>
-                        <v-expansion-panel>
-                          <v-expansion-panel-content style="background-color: #9E9E9E; color: #FAC223">
-                            <template v-slot:header>
-                              Characters
-                            </template>
-                            <v-data-table
-                              :items="movie.charactersNames"
-                              hide-headers
-                              hide-actions
-                            >
-                              <template v-slot:items="props">
-                                <tr style="background-color: #E0E0E0">
-                                  <td>{{ props.item.data.name }}</td>
-                                </tr>
+                        <!-- card com a data table expansivel dos personagens -->
+                        <v-card>
+                          <v-expansion-panel>
+                            <v-expansion-panel-content style="background-color: #9E9E9E; color: #FAC223">
+                              <template v-slot:header>
+                                Characters
                               </template>
-                            </v-data-table>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-card>
-
-                      <v-card>
-                        <v-expansion-panel>
-                          <v-expansion-panel-content style="background-color: #9E9E9E">
-                            <template v-slot:header>
-                              Planets
-                            </template>
-                            <v-data-table
-                              :items="movie.planetsNames"
-                              hide-headers
-                              hide-actions
-                            >
-                              <template v-slot:items="props">
-                                <tr style="background-color: #E0E0E0">
-                                  <td>{{ props.item.data.name }}</td>
-                                </tr>
+                              <v-data-table
+                                :items="movie.charactersNames"
+                                hide-headers
+                                hide-actions
+                              >
+                                <template v-slot:no-data>
+                                    Any character found
+                                </template>
+                                <template v-slot:items="props">
+                                  <tr style="background-color: #E0E0E0">
+                                    <td>{{ props.item.data.name }}</td>
+                                  </tr>
+                                </template>
+                              </v-data-table>
+                            </v-expansion-panel-content>
+                          </v-expansion-panel>
+                        </v-card>
+                        <!-- card com a data table expansivel dos planetas -->
+                        <v-card class="elevation-12">
+                          <v-expansion-panel>
+                            <v-expansion-panel-content style="background-color: #9E9E9E">
+                              <template v-slot:header>
+                                Planets
                               </template>
-                            </v-data-table>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-card>
-
-                      <v-card>
-                        <v-expansion-panel>
-                          <v-expansion-panel-content style="background-color: #9E9E9E">
-                            <template v-slot:header>
-                              Starships
-                            </template>
-                            <v-data-table
-                              :items="movie.starshipsNames"
-                              hide-headers
-                              hide-actions
-                            >
-                              <template v-slot:items="props">
-                                <tr style="background-color: #E0E0E0">
-                                  <td>{{ props.item.data.name }}</td>
-                                </tr>
+                              <v-data-table
+                                :items="movie.planetsNames"
+                                hide-headers
+                                hide-actions
+                              >
+                                <template v-slot:no-data>
+                                    Any planet found
+                                </template>
+                                <template v-slot:items="props">
+                                  <tr style="background-color: #E0E0E0">
+                                    <td>{{ props.item.data.name }}</td>
+                                  </tr>
+                                </template>
+                              </v-data-table>
+                            </v-expansion-panel-content>
+                          </v-expansion-panel>
+                        </v-card>
+                        <!-- card com a data table expansivel das naves espaciais -->
+                        <v-card class="elevation-12">
+                          <v-expansion-panel>
+                            <v-expansion-panel-content style="background-color: #9E9E9E">
+                              <template v-slot:header>
+                                Starships
                               </template>
-                            </v-data-table>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-card>
-
-                      <v-card>
-                        <v-expansion-panel>
-                          <v-expansion-panel-content style="background-color: #9E9E9E">
-                            <template v-slot:header>
-                              Vehicles
-                            </template>
-                            <v-data-table
-                              :items="movie.vehiclesNames"
-                              hide-headers
-                              hide-actions
-                            >
-                              <template v-slot:items="props">
-                                <tr style="background-color: #E0E0E0">
-                                  <td>{{ props.item.data.name }}</td>
-                                </tr>
+                              <v-data-table
+                                :items="movie.starshipsNames"
+                                hide-headers
+                                hide-actions
+                              >
+                                <template v-slot:no-data>
+                                    Any starship found
+                                </template>
+                                <template v-slot:items="props">
+                                  <tr style="background-color: #E0E0E0">
+                                    <td>{{ props.item.data.name }}</td>
+                                  </tr>
+                                </template>
+                              </v-data-table>
+                            </v-expansion-panel-content>
+                          </v-expansion-panel>
+                        </v-card>
+                        <!-- card com a data table expansivel dos veiculos -->
+                        <v-card>
+                          <v-expansion-panel>
+                            <v-expansion-panel-content style="background-color: #9E9E9E">
+                              <template v-slot:header>
+                                Vehicles
                               </template>
-                            </v-data-table>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-card>
-
-                      <v-card>
-                        <v-expansion-panel>
-                          <v-expansion-panel-content style="background-color: #9E9E9E">
-                            <template v-slot:header>
-                              Species
-                            </template>
-                            <v-data-table
-                              :items="movie.speciesNames"
-                              hide-headers
-                              hide-actions
-                            >
-                              <template v-slot:items="props">
-                                <tr style="background-color: #E0E0E0">
-                                  <td>{{ props.item.data.name }}</td>
-                                </tr>
+                              <v-data-table
+                                :items="movie.vehiclesNames"
+                                hide-headers
+                                hide-actions
+                                style="background-color: #9E9E9E"
+                              >
+                                <template v-slot:no-data>
+                                    Any vehicle found
+                                </template>
+                                <template v-slot:items="props">
+                                  <tr style="background-color: #E0E0E0">
+                                    <td>{{ props.item.data.name }}</td>
+                                  </tr>
+                                </template>
+                              </v-data-table>
+                            </v-expansion-panel-content>
+                          </v-expansion-panel>
+                        </v-card>
+                        <!-- card com a data table expansivel das espécies -->
+                        <v-card>
+                          <v-expansion-panel>
+                            <v-expansion-panel-content style="background-color: #9E9E9E">
+                              <template v-slot:header>
+                                Species
                               </template>
-                            </v-data-table>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
+                              <v-data-table
+                                :items="movie.speciesNames"
+                                hide-headers
+                                hide-actions
+                              >
+                                <template v-slot:no-data>
+                                    Any specie found
+                                </template>
+                                <template v-slot:items="props">
+                                  <tr style="background-color: #E0E0E0">
+                                    <td>{{ props.item.data.name }}</td>
+                                  </tr>
+                                </template>
+                              </v-data-table>
+                            </v-expansion-panel-content>
+                          </v-expansion-panel>
+                        </v-card>
                       </v-card>
-                      
                     </v-flex>
                   </v-layout>
                 </v-container>
               </v-card>
             </v-dialog>
-
+            <!-- dialog com a animação da "opening crawl" -->
+            <!-- animação feita por Geoff Graham e adaptada para o uso, mais detalhes nos comentarios nos estilos -->
             <v-dialog v-model="openingCrawl" max-width="800px">
               <v-card color="black" class=".card" height="400px">
                 <v-icon color="primary" @click="openingCrawl=false">close_rounded</v-icon>
@@ -232,24 +267,22 @@
 
 <script>
 import find from "@/services/api-service";
-import axios from "axios";
 
 export default {
   name: 'app',
   data: () => ({
     openingCrawl: false,
-    search: "",
     detailsDialog: false,
+    search: "",
     headers: [
-      { text: "Episode",   value: "episode", width: "10", sortable: false},
+      { text: "Episode",   value: "episode_id", width: "10"},
       { text: "Title",     value: "title"   },
       { text: "",          value: "actions", sortable: false }
     ],
+    roman: ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII"],//array para a exibição dos episódios em algarismos romanos ao invés de numeros convencinais
     movie: {},
     movies: [],
-    roman: ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII"],
-    characters: [],
-    aux: {
+    aux: {//objeto que armazena temporariamente alguns dos dados buscados da api
       characters: [],
       planets: [],
       starships: [],
@@ -258,18 +291,24 @@ export default {
     }
   }),
   methods: {
-    fixPromises() {
-      this.characters = this.movie.characterName;
+    closeDetailsDialog() { // ao fechar a dialog de detalhes, as variaveis abaixo são limpas para evitar dados se sobrepondo 
+      this.movie.charactersNames.splice(this.movie.charactersNames);
+      this.movie.planetsNames.splice(this.movie.planetsNames);
+      this.movie.starshipsNames.splice(this.movie.starshipsNames);
+      this.movie.vehiclesNames.splice(this.movie.vehiclesNames);
+      this.movie.speciesNames.splice(this.movie.speciesNames);
+      this.detailsDialog = !this.detailsDialog;
     },
     openDetailsDialog (item) {
-      this.movie = item;
-      this.movie.charactersNames = [];
-      this.movie.planetsNames = [];
-      this.movie.starshipsNames = [];
-      this.movie.vehiclesNames = [];
-      this.movie.speciesNames = [];
-      this.movie.poster = require(`@/images/posters/${this.movie.episode_id}.jpg`);
-      this.detailsDialog = !this.detailsDialog;
+      this.movie = item;//objeto movie vai recebr o item escolhido na data table
+      this.movie.poster = require(`@/images/posters/${this.movie.episode_id}.jpg`);//carrega o poster correto de acordo com o filme escolhido 
+      this.detailsDialog = !this.detailsDialog;//abre a dialog
+      /*
+      ao fazer a requisição na api, a resposta dos personagens, planetas, espaço naves, veiculos e especies 
+      são uma array contendo o endereço para os respectivos personagens na própria api
+      então é feita uma requisição para cada um deles e então são colocados nas variaveis que estão
+      ligadas na data-table que os exibe
+      */
       this.findCharacter();
       this.movie.charactersNames = this.aux.characters;
       this.findPlanet();
@@ -281,15 +320,15 @@ export default {
       this.findSpecie();
       this.movie.speciesNames = this.aux.species;
     },
-    async listMovies() {
+    async listMovies() { //faz a requisição na api que lista os fillmes da frnaquia
       try {
         let response = await find("films/");
         this.movies = response.data.results;
-      } catch (e) {
-        this.movies = {};
+      } catch {
+        this.$toasted.global.defaultError();
       }
     },
-    async findCharacter() {
+    async findCharacter() { // faz a requisição na api em cada um dos endereços de personagem contidos na array, as funções abaixo fazem o mesmo com seus respectivos objetos
       this.aux.charactersNames = [];
       for(var i in this.movie.characters) {
         find(this.movie.characters[i].slice(21))
@@ -297,7 +336,7 @@ export default {
           this.aux.characters.push(response)
         ))
         .catch(error => (
-          console.log(error)
+          this.$toasted.global.defaultError()
         ))
       }
     },
@@ -309,7 +348,7 @@ export default {
           this.aux.planets.push(response)
         ))
         .catch(error => (
-          console.log(error)
+          this.$toasted.global.defaultError()
         ))
       }
     },
@@ -321,7 +360,7 @@ export default {
           this.aux.starships.push(response)
         ))
         .catch(error => (
-          console.log(error)
+          this.$toasted.global.defaultError()
         ))
       }
     },
@@ -333,7 +372,7 @@ export default {
           this.aux.vehicles.push(response)
         ))
         .catch(error => (
-          console.log(error)
+          this.$toasted.global.defaultError()
         ))
       }
     },
@@ -345,18 +384,23 @@ export default {
           this.aux.species.push(response)
         ))
         .catch(error => (
-          console.log(error)
+          this.$toasted.global.defaultError()
         ))
       }
     }
   },
-  created() {
+  created() {// ao criar a página lista os filmes na data table
     this.listMovies();
   }
 };
 </script>
 
 <style>
+/*
+estilo para a exibição da animação "opening crawl", criado por Geoff Graham
+retirado do site: https://css-tricks.com/snippets/css/star-wars-crawl-text/
+*/
+
 .card {
   width: 100%;
   height: 100%;

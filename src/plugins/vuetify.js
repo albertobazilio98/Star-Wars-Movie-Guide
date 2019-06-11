@@ -6,8 +6,8 @@ import colors from "vuetify/es5/util/colors";
 Vue.use(Vuetify, {
   iconfont: "md",
   theme: {
-    primary: "#FAC223", // #E53935
-    secondary: colors.red.lighten4, // #FFCDD2
+    primary: "#FAC223",
+    secondary: "#9E9E9E",
     accent: colors.indigo.base // #3F51B5
   }
 });
